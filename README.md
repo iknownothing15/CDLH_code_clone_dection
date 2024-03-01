@@ -2,9 +2,9 @@
 
 ## Description
 
-We wish to implement CDLH-based code clone detection, although the code being uploaded is not yet.
+We wish to implement CDLH-based code clone detection, notice that the code being uploaded is not finished yet.
 
-CDLH is a AST-based clone dection AI model, look [this paper](https://dl.acm.org/doi/10.5555/3172077.3172312) to learn more.
+CDLH is a AST-based and tree-LSTM-based clone dection AI model, look [this paper](https://dl.acm.org/doi/10.5555/3172077.3172312) to learn more.
 
 ## Notice
 

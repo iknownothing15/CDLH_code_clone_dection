@@ -11,4 +11,3 @@ CDLH is a AST-based and tree-LSTM-based clone dection AI model, look [this paper
 + I created this repo in a hurry, so it looks very rudimentary and missing a lot of things right now!
 + We used OJ Clone data set.
 + This is only semi finished code, we will update soon.
-+ `temp/data_pairs.pkl` and `temp/data_pairs.pkl` is now anandoned, we will soon remove code that generates it.

@@ -1,4 +1,4 @@
-from scripts.preprocess import read_data_Ontime,init_ast,convert_pairs
+from scripts.preprocess import read_data,init_ast
 import logging
 import torch
 import torch.nn as nn
@@ -54,7 +54,7 @@ def evaluate(test_pairs,word_dict):
     correct = 0
     total = 0
     with torch.no_grad():  # 在评估模式下，我们不需要计算梯度
-        for pair, label in test_pairs:
+        for pair, label in tqdm(test_pairs,desc="testing"):
             output1, _ = model(pair[0])
             output2, _ = model(pair[1])
             distance = torch.pairwise_distance(output1.view(1, -1), output2.view(1, -1), p=1)
@@ -76,8 +76,7 @@ def check(pairSample):
 
 def main():
     # init_ast()
-    # convert_pairs()
-    training_pairs,test_pairs,word_dict=read_data_Ontime()
+    training_pairs,test_pairs,word_dict=read_data()
     # train(training_pairs,word_dict)
     evaluate(test_pairs+training_pairs,word_dict)
 

@@ -77,6 +77,5 @@ class ChildSumTreeLSTM(nn.Module):
         else:
             child_c, child_h = zip(* map(lambda x: x.state, tree.children))
             child_c, child_h = torch.cat(child_c, dim=0), torch.cat(child_h, dim=0)
-
         tree.state = self.node_forward(inputs, child_c, child_h)
         return tree.state

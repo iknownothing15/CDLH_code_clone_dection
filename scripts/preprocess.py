@@ -53,21 +53,21 @@ def init_ast():
     with open('temp/word_dict.pkl','wb') as f:
         pickle.dump(word_dict,f)
 
-def convert_pairs():
-    with open('temp/data_pairs_O.pkl','rb') as f:
-        training_pairs_O=pickle.load(f)
-    with open('temp/test_pairs_O.pkl','rb') as f:
-        test_pairs_O=pickle.load(f)
-    with open('temp/word_dict.pkl','rb') as f:
-        word_dict=pickle.load(f)
-    training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
-    test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
-    with open('temp/data_pairs.pkl','wb') as f:
-        pickle.dump(training_pairs,f)
-    with open('temp/test_pairs.pkl','wb') as f:
-        pickle.dump(test_pairs,f)
+# def convert_pairs():
+#     with open('temp/data_pairs_O.pkl','rb') as f:
+#         training_pairs_O=pickle.load(f)
+#     with open('temp/test_pairs_O.pkl','rb') as f:
+#         test_pairs_O=pickle.load(f)
+#     with open('temp/word_dict.pkl','rb') as f:
+#         word_dict=pickle.load(f)
+#     training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
+#     test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
+#     with open('temp/data_pairs.pkl','wb') as f:
+#         pickle.dump(training_pairs,f)
+#     with open('temp/test_pairs.pkl','wb') as f:
+#         pickle.dump(test_pairs,f)
 
-def read_data_Ontime():
+def read_data():
     training_pairs,test_pairs=[],[]
     with open('temp/data_pairs_O.pkl','rb') as f:
         training_pairs_O=pickle.load(f)
@@ -81,13 +81,13 @@ def read_data_Ontime():
     random.shuffle(test_pairs)
     return training_pairs,test_pairs,word_dict
 
-def read_data():
-    with open('temp/data_pairs.pkl','rb') as f:
-        training_pairs=pickle.load(f)
-    with open('temp/test_pairs.pkl','rb') as f:
-        test_pairs=pickle.load(f)
-    with open('temp/word_dict.pkl','rb') as f:
-        word_dict=pickle.load(f)
-    random.shuffle(training_pairs)
-    random.shuffle(test_pairs)
-    return training_pairs,test_pairs,word_dict
+# def read_data():
+#     with open('temp/data_pairs.pkl','rb') as f:
+#         training_pairs=pickle.load(f)
+#     with open('temp/test_pairs.pkl','rb') as f:
+#         test_pairs=pickle.load(f)
+#     with open('temp/word_dict.pkl','rb') as f:
+#         word_dict=pickle.load(f)
+#     random.shuffle(training_pairs)
+#     random.shuffle(test_pairs)
+#     return training_pairs,test_pairs,word_dict

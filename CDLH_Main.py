@@ -1,5 +1,4 @@
-from scripts.preprocess import read_data,init_ast
-import logging
+from scripts.reader import read_data
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -76,9 +75,9 @@ def check(pairSample):
 
 def main():
     # init_ast()
-    training_pairs,test_pairs,word_dict=read_data()
+    training_pairs,test_pairs,word_dict=read_data(DEBUG=False)
     # train(training_pairs,word_dict)
-    evaluate(test_pairs+training_pairs,word_dict)
+    evaluate(test_pairs,word_dict)
 
 if __name__ == "__main__":
     main()

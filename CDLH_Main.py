@@ -1,10 +1,11 @@
-from scripts.reader import read_data
+from scripts.reader import read_data,read_single_file
+from scripts.preprocess import convertDataSet
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from tqdm import tqdm
-from scripts.model import ChildSumTreeLSTM,convertToLSTMTree
+from scripts.model import ChildSumTreeLSTM
 EMBEDDING_DIM=32
 HIDDEN_DIM=16
 
@@ -64,6 +65,16 @@ def evaluate(test_pairs,word_dict):
     print('Accuracy of the network on the test data: %d %%' % (100 * correct / total))
     return 100 * correct / total
 
+def evaluate_single_pair(pair):
+    model=torch.load('model.pt')
+    with torch.no_grad():
+        output1, _ = model(pair[0])
+        output2, _ = model(pair[1])
+        distance = torch.pairwise_distance(output1.view(1, -1), output2.view(1, -1), p=1)
+        possbility_tensor = 1-distance
+        possbility = possbility_tensor.item()
+        return possbility
+
 def check(pairSample):
     pair,label=pairSample
     print('--------Cutting Line----------')
@@ -75,9 +86,15 @@ def check(pairSample):
 
 def main():
     # init_ast()
-    training_pairs,test_pairs,word_dict=read_data(DEBUG=False)
+    training_pairs_O,test_pairs_O,word_dict=read_data(DEBUG=False)
+    # training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
+    # test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
+    LSTM_Tree1=read_single_file('data/inference/A.cpp',word_dict)
+    LSTM_Tree2=read_single_file('data/inference/B.cpp',word_dict)
+    possibility=evaluate_single_pair((LSTM_Tree1,LSTM_Tree2))
+    print(f"{possibility:.2f}")
     # train(training_pairs,word_dict)
-    evaluate(test_pairs,word_dict)
+    # evaluate(test_pairs,word_dict)
 
 if __name__ == "__main__":
     main()

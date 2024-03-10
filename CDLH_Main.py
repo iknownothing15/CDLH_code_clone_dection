@@ -1,11 +1,14 @@
 from scripts.reader import read_data,read_single_file
 from scripts.preprocess import convertDataSet
+import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from tqdm import tqdm
 from scripts.model import ChildSumTreeLSTM
+import psutil
+import os
 EMBEDDING_DIM=32
 HIDDEN_DIM=16
 
@@ -49,7 +52,6 @@ def train(training_pairs,word_dict,EPOCH=20):
     
 
 def evaluate(test_pairs,word_dict):
-    # test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
     model=torch.load('model.pt')
     correct = 0
     total = 0
@@ -61,9 +63,10 @@ def evaluate(test_pairs,word_dict):
             predict = 1 if distance < 0.5 else -1
             if predict == label:
                 correct += 1
-            total+=1
-    print('Accuracy of the network on the test data: %d %%' % (100 * correct / total))
+            total += 1
     return 100 * correct / total
+
+
 
 def evaluate_single_pair(pair):
     model=torch.load('model.pt')
@@ -83,18 +86,50 @@ def check(pairSample):
     pair[1].print('')
     print('--------Cutting Line----------')
 
+import psutil
+import os
+
+def resource_calc(test_pairs,word_dict):
+    # 获取当前进程
+    process = psutil.Process(os.getpid())
+
+    # 记录开始时的资源使用情况
+    start_resources = process.memory_info()
+    start_cpu_time = process.cpu_times()
+
+    # 执行函数
+    evaluate(test_pairs,word_dict)
+
+    # 记录结束时的资源使用情况
+    end_resources = process.memory_info()
+    end_cpu_time = process.cpu_times()
+
+    # 计算并打印资源使用情况
+    user_time = end_cpu_time.user - start_cpu_time.user
+    system_time = end_cpu_time.system - start_cpu_time.system
+    memory_usage = end_resources.rss - start_resources.rss
+
+    print("User time: {:.2f} ms".format(user_time * 1000))
+    print("System time: {:.2f} ms".format(system_time * 1000))
+    print("Memory usage: {:.2f} KB".format(memory_usage / 1024))
+
+
+def evaluate_single(file1,file2,word_dict):
+    LSTM_Tree1=read_single_file(file1,word_dict)
+    LSTM_Tree2=read_single_file(file2,word_dict)
+    possibility=evaluate_single_pair((LSTM_Tree1,LSTM_Tree2))
+    print(f"{possibility:.2f}")
 
 def main():
     # init_ast()
     training_pairs_O,test_pairs_O,word_dict=read_data(DEBUG=False)
     # training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
-    # test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
-    LSTM_Tree1=read_single_file('data/inference/A.cpp',word_dict)
-    LSTM_Tree2=read_single_file('data/inference/B.cpp',word_dict)
-    possibility=evaluate_single_pair((LSTM_Tree1,LSTM_Tree2))
-    print(f"{possibility:.2f}")
+    test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
     # train(training_pairs,word_dict)
     # evaluate(test_pairs,word_dict)
+    resource_calc(test_pairs,word_dict)
+
+
 
 if __name__ == "__main__":
     main()

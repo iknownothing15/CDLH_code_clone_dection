@@ -1,4 +1,8 @@
+#include<iostream>
+using namespace std;
+
 int n,a,b,T;
+
 inline int fr(){
 	int res=0;char tp=getchar();
 	while(!isdigit(tp)){
@@ -10,6 +14,7 @@ inline int fr(){
 	}
 	return res;
 }
+
 
 int main(){
 	

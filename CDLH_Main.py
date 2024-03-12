@@ -1,6 +1,5 @@
 from scripts.reader import read_data,read_single_file
 from scripts.preprocess import convertDataSet
-import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,6 +8,8 @@ from tqdm import tqdm
 from scripts.model import ChildSumTreeLSTM
 import psutil
 import os
+import pandas as pd
+import time
 EMBEDDING_DIM=32
 HIDDEN_DIM=16
 
@@ -42,15 +43,10 @@ def train(training_pairs,word_dict,EPOCH=20):
             running_loss += loss.item()
             epoch_loss += loss.item()
             # print(i)
-            if i % 400==0:
-                print('running loss of E%d-P%d: %f' % (epoch, i, running_loss / 400))
-                running_loss = 0
         print('epoch %d: finish to train different codes' % epoch)
         print('average loss of epoch %d: %f' % (epoch, epoch_loss / len(training_pairs)))
-
     torch.save(model,'model.pt')
     
-
 def evaluate(test_pairs,word_dict):
     model=torch.load('model.pt')
     correct = 0
@@ -66,7 +62,46 @@ def evaluate(test_pairs,word_dict):
             total += 1
     return 100 * correct / total
 
+def mix_training(training_pairs,test_pairs,word_dict,EPOCHS):
+    # 初始化日志
+    log = pd.DataFrame(columns=['Epoch', 'Accuracy', 'Time', 'CPU Usage', 'Memory Usage'])
 
+    # 获取当前进程
+    process = psutil.Process(os.getpid())
+
+    for epoch in range(1,1+EPOCHS):
+        # 记录开始时的资源使用情况和时间
+        start_resources = process.memory_info()
+        start_cpu_time = process.cpu_times()
+        start_time = time.time()
+
+        train(training_pairs,word_dict,1)
+        accuracy=evaluate(test_pairs,word_dict)
+
+        # 记录结束时的资源使用情况和时间
+        end_resources = process.memory_info()
+        end_cpu_time = process.cpu_times()
+        end_time = time.time()
+
+        # 计算资源使用情况和时间
+        user_time = end_cpu_time.user - start_cpu_time.user
+        system_time = end_cpu_time.system - start_cpu_time.system
+        memory_usage = end_resources.rss - start_resources.rss
+        elapsed_time = end_time - start_time
+
+        # 记录日志
+        log = log.append({
+            'Epoch': epoch,
+            'Accuracy': accuracy,
+            'Time': elapsed_time,
+            'CPU Usage': user_time + system_time,
+            'Memory Usage': memory_usage
+        }, ignore_index=True)
+
+        print(f"Accuracy of epoch {epoch}: {accuracy:.2f}%")
+        
+        # 保存日志
+        log.to_excel('./log/training_log.xlsx', index=False)
 
 def evaluate_single_pair(pair):
     model=torch.load('model.pt')
@@ -85,9 +120,6 @@ def check(pairSample):
     print('--------Cutting Line----------')
     pair[1].print('')
     print('--------Cutting Line----------')
-
-import psutil
-import os
 
 def resource_calc(test_pairs,word_dict):
     # 获取当前进程
@@ -123,11 +155,12 @@ def evaluate_single(file1,file2,word_dict):
 def main():
     # init_ast()
     training_pairs_O,test_pairs_O,word_dict=read_data(DEBUG=False)
-    # training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
+    training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
     test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
-    # train(training_pairs,word_dict)
+    mix_training(training_pairs,test_pairs,word_dict,20)
+    # train(training_pairs,word_dict,1)
     # evaluate(test_pairs,word_dict)
-    resource_calc(test_pairs,word_dict)
+    # resource_calc(test_pairs,word_dict)
 
 
 

@@ -14,6 +14,10 @@ def read_data(DEBUG=False):
     random.shuffle(test_pairs)
     return training_pairs,test_pairs,word_dict
 
+def read_word_dict():
+    with open('temp/word_dict.pkl','rb') as f:
+        word_dict=pickle.load(f)
+    return word_dict
 
 def read_single_file(file,word_dict):
     tree=read_file(file)

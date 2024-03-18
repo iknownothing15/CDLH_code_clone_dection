@@ -13,10 +13,12 @@ import time
 EMBEDDING_DIM=32
 HIDDEN_DIM=16
 
-def train(training_pairs,word_dict,EPOCH=20):
-    # training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
-    model=ChildSumTreeLSTM(EMBEDDING_DIM,HIDDEN_DIM,len(word_dict)+1)
-    # model=torch.load('model.pt')
+def train(training_pairs,word_dict,EPOCH=20,file=None):
+    if file is None:
+        model=ChildSumTreeLSTM(EMBEDDING_DIM,HIDDEN_DIM,len(word_dict)+1)
+        file='model.pt'
+    else :
+        model=torch.load(file)
     loss_function=nn.HingeEmbeddingLoss()
     optimizer=optim.SGD(model.parameters(),lr=0.1)
     for epoch in range(1,1+EPOCH):
@@ -45,12 +47,13 @@ def train(training_pairs,word_dict,EPOCH=20):
             # print(i)
         print('epoch %d: finish to train different codes' % epoch)
         print('average loss of epoch %d: %f' % (epoch, epoch_loss / len(training_pairs)))
-    torch.save(model,'model.pt')
+    torch.save(model,file)
     
-def evaluate(test_pairs,word_dict):
-    model=torch.load('model.pt')
+def evaluate(test_pairs,word_dict,file='model.pt'):
+    model=torch.load(file)
     correct = 0
     total = 0
+    TP,TN,FP=0,0,0
     with torch.no_grad():  # 在评估模式下，我们不需要计算梯度
         for pair, label in tqdm(test_pairs,desc="testing"):
             output1, _ = model(pair[0])
@@ -59,12 +62,22 @@ def evaluate(test_pairs,word_dict):
             predict = 1 if distance < 0.5 else -1
             if predict == label:
                 correct += 1
+            if predict==1 and label==1:
+                TP+=1
+            if predict==-1 and label==-1:
+                TN+=1
+            if predict==1 and label==-1:
+                FP+=1
             total += 1
-    return 100 * correct / total
+    Accuracy=correct / total
+    Precision=TP/(TP+FP)
+    Recall=TP/(TP+TN)
+    F1=2*Precision*Recall/(Precision+Recall)
+    return Accuracy,Precision,Recall,F1
 
 def mix_training(training_pairs,test_pairs,word_dict,EPOCHS):
     # 初始化日志
-    log = pd.DataFrame(columns=['Epoch', 'Accuracy', 'Time', 'CPU Usage', 'Memory Usage'])
+    log = pd.DataFrame(columns=['Epoch','Accuracy','Precision','Recall','F1','User time','System time','Memory usage','Elapsed time'])
 
     # 获取当前进程
     process = psutil.Process(os.getpid())
@@ -75,8 +88,11 @@ def mix_training(training_pairs,test_pairs,word_dict,EPOCHS):
         start_cpu_time = process.cpu_times()
         start_time = time.time()
 
-        train(training_pairs,word_dict,1)
-        accuracy=evaluate(test_pairs,word_dict)
+        if epoch==1:
+            train(training_pairs,word_dict,1)
+        else :
+            train(training_pairs,word_dict,1,'model.pt')
+        Accuracy,Precision,Recall,F1=evaluate(test_pairs,word_dict)
 
         # 记录结束时的资源使用情况和时间
         end_resources = process.memory_info()
@@ -89,16 +105,23 @@ def mix_training(training_pairs,test_pairs,word_dict,EPOCHS):
         memory_usage = end_resources.rss - start_resources.rss
         elapsed_time = end_time - start_time
 
-        # 记录日志
-        log = log.append({
-            'Epoch': epoch,
-            'Accuracy': accuracy,
-            'Time': elapsed_time,
-            'CPU Usage': user_time + system_time,
-            'Memory Usage': memory_usage
-        }, ignore_index=True)
+        # 创建新的日志记录
+        new_log = pd.DataFrame({
+            'Epoch': [epoch],
+            'Accuracy': [Accuracy],
+            'Precision': [Precision],
+            'Recall': [Recall],
+            'F1': [F1],
+            'User time': [user_time],
+            'System time': [system_time],
+            'Memory usage': [memory_usage],
+            'Elapsed time': [elapsed_time]
+        })
 
-        print(f"Accuracy of epoch {epoch}: {accuracy:.2f}%")
+        # 将新的日志记录添加到现有的日志
+        log = pd.concat([log, new_log], ignore_index=True)
+
+        print(f"Accuracy of epoch {epoch}: {Accuracy*100:.2f}%")
         
         # 保存日志
         log.to_excel('./log/training_log.xlsx', index=False)

@@ -20,7 +20,7 @@ def train(training_pairs,word_dict,EPOCH=20,file=None):
     else :
         model=torch.load(file)
     loss_function=nn.HingeEmbeddingLoss()
-    optimizer=optim.SGD(model.parameters(),lr=0.1)
+    optimizer=optim.SGD(model.parameters(),lr=0.01)
     for epoch in range(1,1+EPOCH):
         i = 1
         epoch_loss = 0
@@ -85,7 +85,7 @@ def mix_training(training_pairs,test_pairs,word_dict,EPOCHS):
     # 获取当前进程
     process = psutil.Process(os.getpid())
 
-    for epoch in range(1,1+EPOCHS):
+    for epoch in range(15,15+EPOCHS):
         # 记录开始时的资源使用情况和时间
         start_resources = process.memory_info()
         start_cpu_time = process.cpu_times()

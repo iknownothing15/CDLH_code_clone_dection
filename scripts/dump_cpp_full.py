@@ -1,7 +1,7 @@
 import pickle
 import sys
 import os
-
+IGNORE_SIZE=0
 TRAIN_SIZE=1000
 TEST_SIZE=100
 
@@ -31,11 +31,13 @@ if __name__=='__main__':
     for i in range(len(ids)):
         if(ids.label[i]==1):
             count=count+1
-            if(count<=TRAIN_SIZE):
+            if(count<=IGNORE_SIZE):
+                continue
+            if(count<=TRAIN_SIZE+IGNORE_SIZE):
                 vis_training[ids.id1[i]]=1
                 vis_training[ids.id2[i]]=1
                 map_training.append(((ids.id1[i],ids.id2[i]),1))
-            elif(count<=TRAIN_SIZE+TEST_SIZE):
+            elif(count<=TRAIN_SIZE+TEST_SIZE+IGNORE_SIZE):
                 vis_test[ids.id1[i]]=1
                 vis_test[ids.id2[i]]=1 
                 map_test.append(((ids.id1[i],ids.id2[i]),1))
@@ -46,11 +48,13 @@ if __name__=='__main__':
     for i in range(len(ids)):
         if(ids.label[i]==0):
             count=count+1
-            if(count<=TRAIN_SIZE):
+            if(count<=IGNORE_SIZE):
+                continue
+            if(count<=TRAIN_SIZE+IGNORE_SIZE):
                 vis_training[ids.id1[i]]=1
                 vis_training[ids.id2[i]]=1
                 map_training.append(((ids.id1[i],ids.id2[i]),-1))
-            elif(count<=TRAIN_SIZE+TEST_SIZE):
+            elif(count<=TRAIN_SIZE+TEST_SIZE+IGNORE_SIZE):
                 vis_test[ids.id1[i]]=1
                 vis_test[ids.id2[i]]=1 
                 map_test.append(((ids.id1[i],ids.id2[i]),-1))

@@ -1,5 +1,5 @@
 from scripts.reader import read_data,read_single_file
-from scripts.preprocess import convertDataSet
+from scripts.preprocess import convertDataSet,init_ast
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -85,7 +85,7 @@ def mix_training(training_pairs,test_pairs,word_dict,EPOCHS):
     # 获取当前进程
     process = psutil.Process(os.getpid())
 
-    for epoch in range(15,15+EPOCHS):
+    for epoch in range(20,20+EPOCHS):
         # 记录开始时的资源使用情况和时间
         start_resources = process.memory_info()
         start_cpu_time = process.cpu_times()
@@ -180,12 +180,12 @@ def evaluate_single(file1,file2,word_dict):
 def main():
     # init_ast()
     training_pairs_O,test_pairs_O,word_dict=read_data(DEBUG=False)
-    training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
+    # training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
     test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
-    mix_training(training_pairs,test_pairs,word_dict,20)
+    # mix_training(training_pairs,test_pairs,word_dict,20)
     # train(training_pairs,word_dict,1)
-    # evaluate(test_pairs,word_dict)
-    # resource_calc(test_pairs,word_dict)
+    Accuracy,Precision,Recall,F1=evaluate(test_pairs,word_dict)
+    print(f'Accuracy: {Accuracy*100:.2f}%')
 
 
 

@@ -53,7 +53,7 @@ def evaluate(test_pairs,word_dict,file='model.pt'):
     model=torch.load(file)
     correct = 0
     total = 0
-    TP,TN,FP=0,0,0
+    TP,TN,FP,FN=0,0,0,0
     with torch.no_grad():  # 在评估模式下，我们不需要计算梯度
         for pair, label in tqdm(test_pairs,desc="testing"):
             output1, _ = model(pair[0])
@@ -68,10 +68,13 @@ def evaluate(test_pairs,word_dict,file='model.pt'):
                 TN+=1
             if predict==1 and label==-1:
                 FP+=1
+            if predict==-1 and label==1:
+                FN+=1
             total += 1
+    # print(TP,TN,FP)
     Accuracy=correct / total
     Precision=TP/(TP+FP)
-    Recall=TP/(TP+TN)
+    Recall=TP/(TP+FN)
     F1=2*Precision*Recall/(Precision+Recall)
     return Accuracy,Precision,Recall,F1
 
@@ -87,10 +90,9 @@ def mix_training(training_pairs,test_pairs,word_dict,EPOCHS):
         start_resources = process.memory_info()
         start_cpu_time = process.cpu_times()
         start_time = time.time()
-
         if epoch==1:
             train(training_pairs,word_dict,1)
-        else :
+        else:
             train(training_pairs,word_dict,1,'model.pt')
         Accuracy,Precision,Recall,F1=evaluate(test_pairs,word_dict)
 

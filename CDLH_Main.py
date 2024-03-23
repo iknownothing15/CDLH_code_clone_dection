@@ -13,7 +13,7 @@ import time
 EMBEDDING_DIM=32
 HIDDEN_DIM=16
 
-def train(training_pairs,word_dict,EPOCH=20,file=None):
+def train(training_pairs,word_dict,EPOCHL,EPOCHR,file=None):
     if file is None:
         model=ChildSumTreeLSTM(EMBEDDING_DIM,HIDDEN_DIM,len(word_dict)+1)
         file='model.pt'
@@ -21,7 +21,7 @@ def train(training_pairs,word_dict,EPOCH=20,file=None):
         model=torch.load(file)
     loss_function=nn.HingeEmbeddingLoss()
     optimizer=optim.SGD(model.parameters(),lr=0.01)
-    for epoch in range(1,1+EPOCH):
+    for epoch in range(EPOCHL,EPOCHR+1):
         i = 1
         epoch_loss = 0
         running_loss = 0
@@ -80,31 +80,21 @@ def evaluate(test_pairs,word_dict,file='model.pt'):
 
 def mix_training(training_pairs,test_pairs,word_dict,EPOCHS):
     # 初始化日志
-    log = pd.DataFrame(columns=['Epoch','Accuracy','Precision','Recall','F1','User time','System time','Memory usage','Elapsed time'])
+    log = pd.DataFrame(columns=['Epoch','Accuracy','Precision','Recall','F1','Elapsed time'])
 
-    # 获取当前进程
-    process = psutil.Process(os.getpid())
-
-    for epoch in range(20,20+EPOCHS):
+    for epoch in range(1,1+EPOCHS):
         # 记录开始时的资源使用情况和时间
-        start_resources = process.memory_info()
-        start_cpu_time = process.cpu_times()
         start_time = time.time()
         if epoch==1:
-            train(training_pairs,word_dict,1)
+            train(training_pairs,word_dict,epoch,epoch)
         else:
-            train(training_pairs,word_dict,1,'model.pt')
+            train(training_pairs,word_dict,epoch,epoch,'model.pt')
         Accuracy,Precision,Recall,F1=evaluate(test_pairs,word_dict)
 
         # 记录结束时的资源使用情况和时间
-        end_resources = process.memory_info()
-        end_cpu_time = process.cpu_times()
         end_time = time.time()
 
         # 计算资源使用情况和时间
-        user_time = end_cpu_time.user - start_cpu_time.user
-        system_time = end_cpu_time.system - start_cpu_time.system
-        memory_usage = end_resources.rss - start_resources.rss
         elapsed_time = end_time - start_time
 
         # 创建新的日志记录
@@ -114,9 +104,6 @@ def mix_training(training_pairs,test_pairs,word_dict,EPOCHS):
             'Precision': [Precision],
             'Recall': [Recall],
             'F1': [F1],
-            'User time': [user_time],
-            'System time': [system_time],
-            'Memory usage': [memory_usage],
             'Elapsed time': [elapsed_time]
         })
 
@@ -126,7 +113,11 @@ def mix_training(training_pairs,test_pairs,word_dict,EPOCHS):
         print(f"Accuracy of epoch {epoch}: {Accuracy*100:.2f}%")
         
         # 保存日志
-        log.to_excel('./log/training_log.xlsx', index=False)
+        try:
+            log.to_excel('./log/training_log.xlsx', index=False)
+        except PermissionError:
+            print("无法保存日志文件，因为文件已被其他程序打开。")
+            log.to_csv('./log/training_log.csv', index=False)
 
 def evaluate_single_pair(pair):
     model=torch.load('model.pt')
@@ -138,54 +129,19 @@ def evaluate_single_pair(pair):
         possbility = possbility_tensor.item()
         return possbility
 
-def check(pairSample):
-    pair,label=pairSample
-    print('--------Cutting Line----------')
-    pair[0].print('')
-    print('--------Cutting Line----------')
-    pair[1].print('')
-    print('--------Cutting Line----------')
-
-def resource_calc(test_pairs,word_dict):
-    # 获取当前进程
-    process = psutil.Process(os.getpid())
-
-    # 记录开始时的资源使用情况
-    start_resources = process.memory_info()
-    start_cpu_time = process.cpu_times()
-
-    # 执行函数
-    evaluate(test_pairs,word_dict)
-
-    # 记录结束时的资源使用情况
-    end_resources = process.memory_info()
-    end_cpu_time = process.cpu_times()
-
-    # 计算并打印资源使用情况
-    user_time = end_cpu_time.user - start_cpu_time.user
-    system_time = end_cpu_time.system - start_cpu_time.system
-    memory_usage = end_resources.rss - start_resources.rss
-
-    print("User time: {:.2f} ms".format(user_time * 1000))
-    print("System time: {:.2f} ms".format(system_time * 1000))
-    print("Memory usage: {:.2f} KB".format(memory_usage / 1024))
-
-
 def evaluate_single(file1,file2,word_dict):
     LSTM_Tree1=read_single_file(file1,word_dict)
     LSTM_Tree2=read_single_file(file2,word_dict)
     possibility=evaluate_single_pair((LSTM_Tree1,LSTM_Tree2))
-    print(f"{possibility:.2f}")
+    return possibility
 
 def main():
     # init_ast()
     training_pairs_O,test_pairs_O,word_dict=read_data(DEBUG=False)
-    # training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
+    training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
     test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
-    # mix_training(training_pairs,test_pairs,word_dict,20)
-    # train(training_pairs,word_dict,1)
-    Accuracy,Precision,Recall,F1=evaluate(test_pairs,word_dict)
-    print(f'Accuracy: {Accuracy*100:.2f}%')
+    mix_training(training_pairs,test_pairs,word_dict,20)
+    # Accuracy,Precision,Recall,F1=evaluate(test_pairs,word_dict)
 
 
 

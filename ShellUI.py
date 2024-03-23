@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from scripts.preprocess import convertDataSet
 from scripts.reader import read_data,read_single_file,read_word_dict
-from CDLH_Main import evaluate_single_pair,EMBEDDING_DIM,HIDDEN_DIM
+from CDLH_Main import evaluate_single,EMBEDDING_DIM,HIDDEN_DIM
 import threading
 import torch
 import torch.nn as nn
@@ -40,9 +40,7 @@ def UI_launch_evalvate(text1_content,text2_content):
     with open("./data/inference/2.cpp", "w") as f:
         f.write(text2_content)
     global word_dict
-    LSTM_Tree1 = read_single_file("./data/inference/1.cpp", word_dict)
-    LSTM_Tree2 = read_single_file("./data/inference/2.cpp", word_dict)
-    possibility=evaluate_single_pair((LSTM_Tree1,LSTM_Tree2))
+    possibility = evaluate_single("./data/inference/1.cpp", "./data/inference/2.cpp", word_dict)
     evaluating_window.destroy()
     messagebox.showinfo("结果", f"相似度为{possibility:.2f}")
 

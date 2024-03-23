@@ -2,8 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from scripts.preprocess import convertDataSet
-from scripts.reader import read_data,read_single_file,read_word_dict
-from CDLH_Main import evaluate_single,EMBEDDING_DIM,HIDDEN_DIM
+from scripts.reader import read_data
+from evaluate import evaluate_single
+from settings.consts import EMBEDDING_DIM,HIDDEN_DIM
 import threading
 import torch
 import torch.nn as nn

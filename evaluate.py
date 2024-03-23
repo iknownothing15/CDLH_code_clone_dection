@@ -26,9 +26,9 @@ def evaluate(test_pairs,word_dict,file='model.pt'):
             total += 1
     # print(TP,TN,FP)
     Accuracy=correct / total
-    Precision=TP/(TP+FP)
-    Recall=TP/(TP+FN)
-    F1=2*Precision*Recall/(Precision+Recall)
+    Precision=TP/(TP+FP) if TP+FP!=0 else 1.0
+    Recall=TP/(TP+FN)  if TP+FN!=0 else 1.0
+    F1=2*Precision*Recall/(Precision+Recall) if Precision+Recall!=0 else 1.0
     return Accuracy,Precision,Recall,F1
 
 def evaluate_single_pair(pair):

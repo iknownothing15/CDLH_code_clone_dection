@@ -42,7 +42,7 @@ def train(training_pairs,word_dict,EPOCHL,EPOCHR):
         print('epoch %d: finish to train different codes' % epoch)
         print('average loss of epoch %d: %f' % (epoch, epoch_loss / len(training_pairs)))
     torch.save(model,'model.pt')
-    torch.save(model,'model/trained_model_epoch%d.pt' % epoch)
+    torch.save(model,'models/trainging/training_model_epoch%d.pt' % epoch)
 
 def mix_training(training_pairs,test_pairs,word_dict,EPOCHL,EPOCHR):
     # 初始化日志

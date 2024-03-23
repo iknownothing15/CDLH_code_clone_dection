@@ -14,7 +14,7 @@ def train(training_pairs,word_dict,EPOCHL,EPOCHR):
     else :
         model=torch.load('model.pt')
     loss_function=nn.HingeEmbeddingLoss()
-    optimizer=optim.SGD(model.parameters(),lr=0.01)
+    optimizer=optim.SGD(model.parameters(),lr=0.1)
     for epoch in range(EPOCHL,EPOCHR+1):
         i = 1
         epoch_loss = 0

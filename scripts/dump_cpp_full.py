@@ -73,13 +73,11 @@ if __name__=='__main__':
     if(TRAIN_SIZE_D+TEST_SIZE_D>len(mapD)):
         print('Error: There are not enough negative samples')
         sys.exit()
-    random.shuffle(mapS)
-    random.shuffle(mapD)
+    random.shuffle(mapS),random.shuffle(mapD)
     vis_training,map_training=dump_data_set(TRAIN_SIZE_S,TRAIN_SIZE_D,mapS,mapD)
-    random.shuffle(mapS)
-    random.shuffle(mapD)
+    random.shuffle(mapS),random.shuffle(mapD)
     vis_test,map_test=dump_data_set(TEST_SIZE_S,TEST_SIZE_D,mapS,mapD)
-    print('diff_pairs'+count_diff(map_training,map_test))
+    print('diff_pairs'+str(count_diff(map_training,map_test)))
     print(len(map_training),len(map_test))
     # label
     dump_info('data/training/',programs,vis_training,map_training)

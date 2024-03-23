@@ -44,6 +44,18 @@ def dump_data_set(numS,numD,mapS,mapD):
         map.append(mapD[i])
     return vis,map
 
+def count_diff(list1,list2):
+    diff=0
+    for i in range(len(list1)):
+        is_same=False
+        for j in range(len(list2)):
+            if(list1[i]==list2[j]):
+                is_same=True
+                break
+        if(not is_same):
+            diff+=1
+    return diff
+            
 if __name__=='__main__':
     vis_training,vis_test={},{}
     map_training,map_test=[],[]
@@ -67,6 +79,8 @@ if __name__=='__main__':
     random.shuffle(mapS)
     random.shuffle(mapD)
     vis_test,map_test=dump_data_set(TEST_SIZE_S,TEST_SIZE_D,mapS,mapD)
+    print('diff_pairs'+count_diff(map_training,map_test))
+    print(len(map_training),len(map_test))
     # label
     dump_info('data/training/',programs,vis_training,map_training)
     dump_info('data/test/',programs,vis_test,map_test)

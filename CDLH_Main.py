@@ -8,7 +8,7 @@ def main():
     training_pairs_O,test_pairs_O,word_dict=read_data(DEBUG=False)
     training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
     test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
-    mix_training(training_pairs,test_pairs,word_dict,1,20)
+    mix_training(training_pairs,test_pairs,word_dict,1,15)
     
 if __name__ == "__main__":
     main()

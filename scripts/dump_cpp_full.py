@@ -29,13 +29,13 @@ def init_pairs(ids):
             mapS.append(((ids.id1[i],ids.id2[i]),+1))
         elif(ids.label[i]==0):
             mapD.append(((ids.id1[i],ids.id2[i]),-1))
-    random.shuffle(mapS)
-    random.shuffle(mapD)
     return mapS,mapD
 
-def dump_data_set(numS,numD):
+def dump_data_set(numS,numD,mapS,mapD):
     vis={}
     map=[]
+    random.shuffle(mapS)
+    random.shuffle(mapD)
     for i in range(numS):
         vis[mapS[i][0][0]]=1
         vis[mapS[i][0][1]]=1
@@ -63,8 +63,8 @@ if __name__=='__main__':
     if(TRAIN_SIZE_D+TEST_SIZE_D>len(mapD)):
         print('Error: There are not enough negative samples')
         sys.exit()
-    vis_training,map_training=dump_data_set(TRAIN_SIZE_S,TRAIN_SIZE_D)
-    vis_test,map_test=dump_data_set(TEST_SIZE_S,TEST_SIZE_D)
+    vis_training,map_training=dump_data_set(TRAIN_SIZE_S,TRAIN_SIZE_D,mapS,mapD)
+    vis_test,map_test=dump_data_set(TEST_SIZE_S,TEST_SIZE_D,mapS,mapD)
     # label
     dump_info('data/training/',programs,vis_training,map_training)
     dump_info('data/test/',programs,vis_test,map_test)

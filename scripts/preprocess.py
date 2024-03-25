@@ -52,3 +52,18 @@ def init_ast():
         pickle.dump(test_pairs,f)
     with open('temp/word_dict.pkl','wb') as f:
         pickle.dump(word_dict,f)
+
+def RE_init_ast():
+    # print("!!!DEBUG!!!")
+    training_pairs,test_pairs=[],[]
+    file_training=open('data/training/oj_clone_mapping.pkl','rb')
+    file_test=open('data/test/oj_clone_mapping.pkl','rb')
+    training_pairs=pickle.load(file_training)
+    test_pairs=pickle.load(file_test)
+    training_pairs=init_pairs('data/training',training_pairs)
+    test_pairs=init_pairs('data/test',test_pairs)
+
+    with open('temp/data_pairs.pkl','wb') as f:
+        pickle.dump(training_pairs,f)
+    with open('temp/test_pairs.pkl','wb') as f:
+        pickle.dump(test_pairs,f)

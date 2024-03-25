@@ -49,5 +49,10 @@ def evaluate_single(file1,file2,word_dict):
 
 def get_evaluation_result(test_pairs,word_dict):
     Accuracy,Precision,Recall,F1=evaluate(test_pairs,word_dict)
-    result ='Accuracy: %f\nPrecision: %f\nRecall: %f\nF1: %f\n' % (Accuracy,Precision,Recall,F1)
+    result = {
+        'Accuracy': Accuracy,
+        'Precision': Precision,
+        'Recall': Recall,
+        'F1': F1
+    }
     return result

@@ -5,11 +5,11 @@ from evaluate import get_evaluation_result
 
 def main():
     RE_init_ast()
-    # training_pairs_O,test_pairs_O,word_dict=read_data(DEBUG=False)
+    training_pairs_O,test_pairs_O,word_dict=read_data(DEBUG=False)
     # training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
-    # test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
+    test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
     # mix_training(training_pairs,test_pairs,word_dict,31,45)
-    # print(get_evaluation_result(test_pairs,word_dict))
+    print(get_evaluation_result(test_pairs,word_dict))
     
 if __name__ == "__main__":
     main()

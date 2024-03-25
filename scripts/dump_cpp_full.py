@@ -1,5 +1,6 @@
 import random
 import pickle
+import time
 import sys
 import os
 TRAIN_SIZE_S=500
@@ -57,6 +58,7 @@ def count_diff(list1,list2):
     return diff
             
 if __name__=='__main__':
+    random.seed(time.time())
     vis_training,vis_test={},{}
     map_training,map_test=[],[]
     # init
@@ -77,7 +79,7 @@ if __name__=='__main__':
     vis_training,map_training=dump_data_set(TRAIN_SIZE_S,TRAIN_SIZE_D,mapS,mapD)
     random.shuffle(mapS),random.shuffle(mapD)
     vis_test,map_test=dump_data_set(TEST_SIZE_S,TEST_SIZE_D,mapS,mapD)
-    print('diff_pairs'+str(count_diff(map_training,map_test)))
+    print('diff_pairs:'+str(count_diff(map_training,map_test)))
     print(len(map_training),len(map_test))
     # label
     dump_info('data/training/',programs,vis_training,map_training)

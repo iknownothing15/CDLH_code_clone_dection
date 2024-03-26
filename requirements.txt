@@ -1,2 +1,5 @@
-torch==1.9.0
-pycparser==2.20
+tqdm
+torch
+pandas
+tkinter
+pycparser

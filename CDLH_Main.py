@@ -4,7 +4,7 @@ from train import mix_training
 from evaluate import get_evaluation_result
 
 def main():
-    RE_init_ast()
+    # RE_init_ast()
     training_pairs_O,test_pairs_O,word_dict=read_data(DEBUG=False)
     # training_pairs=convertDataSet(training_pairs_O,word_dict,'training')
     test_pairs=convertDataSet(test_pairs_O,word_dict,'test')
